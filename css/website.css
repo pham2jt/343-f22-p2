@@ -1,9 +1,15 @@
 form {
     display: block;
-    margin: 10%;
+    margin-top: 5%;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 
 #results {
     display: block;
-    margin: 10%;
+}
+
+figure {
+    display: inline-block;
+    padding: 10px;
 }

@@ -60,32 +60,46 @@ function searchForArtistTopSongs(spotifyApiKey, searchQuery) {
 
           // get the song IDs from the response data
           const songNames = data.tracks.map(track => track.name);
-          const wordCounts = new Map();
-          // use the Rap Genius API to get the lyrics for the artist's top songs
-          songNames.forEach(songName => {
-            fetch(`matcher.lyrics.get?q_track=${songName}&q_artist=${artistName}&apikey=${lyricApiKey}`)
-              .then(response => response.json())
-              .then((lyrics) => {
-                console.log(lyrics);
-                lyrics.message.body.lyrics.lyrics_body.split(" ").forEach(word => {
-                  // increment the word count in the map
-                  wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
-                });
-              })
-              .catch(error => {
-                console.log("No lyrics found for this track");
-              })
-          })
           
-
-              // sort the word counts by the most common words
-              const sortedWordCounts = [...wordCounts.entries()].sort((a, b) => b[1] - a[1]);
-              
-              // create a list of the most common words and their counts
-              const wordList = sortedWordCounts.map(entry => `${entry[0]}: ${entry[1]}`);
-
-              // set the inner HTML of the results div to the list of words and counts
-              resultsDiv.innerHTML = wordList.join("<br>");
-            });
+          const strSongs = songNames.join(" ");
+          console.log(strSongs);
+          wordcloud(strSongs, artistName);
+          })
         });
-    };
+};
+    
+function wordcloud(string, name) {
+  fetch(`https://quickchart.io/wordcloud?text=${string}&format=png`)
+    .then(response => response.blob())
+    .then(blobResponse => {
+      data = blobResponse;
+      const urlCreator = window.URL || window.webkitURL;
+      // create elements
+      var fig = document.createElement("figure");
+      var img = new Image();
+    
+      img.src = urlCreator.createObjectURL(data);
+      img.caption
+
+      fig.appendChild(img);
+
+      // create caption
+      var cap = document.createElement("figcaption");
+      cap.innerText = `This is a word cloud of ${name}'s top songs on Spotify`;
+
+      fig.appendChild(cap);
+      resultsDiv.appendChild(fig);
+
+      // create clear button
+      var button = document.createElement("button");
+      button.setAttribute("type", "button");
+      button.innerText = "click to clear this image";
+      button.setAttribute("class", "btn btn-secondary");
+      button.addEventListener("click", event => {
+        fig.innerHTML = "";
+      })
+
+      fig.appendChild(button);
+    })
+  
+};
